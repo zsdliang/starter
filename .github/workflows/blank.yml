@@ -1,0 +1,519 @@
+/*学号：200111233
+**班级：12
+**姓名：黄东亮
+**实验序号：8
+*/
+
+//特点：输出和排序并不交换元素位置，而是按照元素大小进行检索，并给已输出或排序的元素的标记赋为1，再次检索时跳过标记为1的元素
+        
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+struct studata
+{
+    char mname[20];
+    int number;
+    int ranking;
+    double mscores[8];
+    int flag;
+}mdata[30];
+int input(int (*pfunc)(void));
+int total(void);
+int select(void);
+int ftotsco(void);
+void caculate(int itotal,int totsco);
+void sort(int itotal,int totsco);
+void namesort(int itotal,int totsco);
+void namsearch(int itotal,int totsco);
+void numsearch(int itotal,int totsco);
+void analysis(int itotal,int totsco);
+void output(int itotal,int totsco,int (*poutput)(void));
+int choose4(void);
+int choose5(void);
+int choose6(void);
+int main()
+{
+    int i,j,k,itotal,totsco,flag=1,mark=0,choose;
+    double sum;
+    itotal=input(total);
+    totsco=input(ftotsco);
+    while(flag)
+    {
+        printf("\n"
+               "\n"
+               "1. Input record\n"
+               "2. Calculate total and average score of every course\n"
+               "3. Calculate total and average score of every student\n"
+               "4. Sort in descending order by total score of every student\n"
+               "5. Sort in ascending order by total score of every student \n"
+               "6. Sort in ascending order by number\n"
+               "7. Sort in dictionary order by name \n"
+               "8. Search by number \n"
+               "9. Search by name \n"
+               "10.Statistic analysis for every course \n"
+               "11.List record \n"
+               "0. Exit\n\n");
+        choose=input(select);
+        if(choose==0)
+        {
+            exit(1);
+        }
+        else if(choose==1)
+        {
+            for(i=0;i<itotal;i++)
+            {
+                printf("please input the stdent.%d's number and name:",i+1);
+                scanf("%d %s",&mdata[i].number,mdata[i].mname);
+                printf("please input student.%d's scores:",i+1);
+                for(j=0;j<totsco;j++)
+                {
+                    scanf("%lf",&mdata[i].mscores[j]);
+                }
+            }
+            caculate(itotal,totsco);
+            sort(itotal,totsco);
+            mark=1;
+        }
+        else if(mark==0)
+        {
+            printf("you should input data first!\n");
+            continue;
+        }
+        else if(choose==2)
+        {
+            for(i=0;i<totsco;i++)
+            {
+                sum=0;
+                for(j=0;j<itotal;j++)
+                {
+                    sum+=mdata[j].mscores[i];
+                }
+                printf("course.%d: totscore: %3.1lf averagescore: %2.3lf\n",i+1,sum,sum/totsco);
+            }
+        }
+        else if(choose==3)
+        {
+            caculate(itotal,totsco);
+            for(i=0;i<itotal;i++)
+            {
+                printf("number: %10d name: %15s  ",mdata[i].number,mdata[i].mname);
+                printf("totscore: %3.1lf averagescore :%2.3lf",mdata[i].mscores[totsco],mdata[i].mscores[totsco+1]);
+                printf("\n");
+            }
+        }
+        else if(choose==4)
+        {
+            output(itotal,totsco,choose4);
+        }
+        else if(choose==5)
+        {
+            output(itotal,totsco,choose5);
+        }
+        else if(choose==6)
+        {
+            output(itotal,totsco,choose6);
+        }
+        else if(choose==7)
+        {
+            namesort(itotal,totsco);
+        }
+        else if(choose==8)
+        {
+            numsearch(itotal,totsco);
+        }
+        else if(choose==9)
+        {
+            namsearch(itotal,totsco);
+        }
+        else if(choose==10)
+        {
+            analysis(itotal,totsco);
+        }
+        else if(choose==11)
+        {
+            output(itotal,totsco,choose4);
+        }
+    }
+    return 0;
+}
+
+//用于防止乱输入学生总人数和选择的函数
+int input(int (*pfunc)(void))
+{
+    int a, ret, flag = 1;
+    char b, c;
+    while (flag)
+    {
+        if ((*pfunc)() == 30)
+        {
+            printf("please input the total number of the students:");
+        }
+        else if((*pfunc)() == 11)
+        {
+            printf("Please enter your choice:");
+        }
+        else
+        {
+            printf("How many courses?");
+        }
+        ret = scanf("%d", &a);
+        {
+            c = getchar();
+            if (c != '\n')
+            {
+                do
+                {
+                    c = getchar();
+                } while (c != '\n');
+                continue;
+            }
+        }
+        while (ret != 1)
+        {
+            do
+            {
+                b = getchar();
+            } while (b != '\n');
+            if ((*pfunc)() == 30)
+            {
+                printf("please input the total number of the students:");
+            }
+            else if((*pfunc)() == 11)
+            {
+                printf("Please enter your choice:");
+            }
+            else
+            {
+                printf("How many courses?");
+            }
+            ret = scanf("%d", &a);
+        }
+        if (a > (*pfunc)() || a < 0)
+        {
+            continue;
+        }
+        if (ret = 1)
+            flag = 0;
+    }
+    return a;
+}
+int total(void)
+{
+    return 30;
+}
+int select(void)
+{
+    return 11;
+}
+int ftotsco(void)
+{
+    return 6;
+}
+
+void caculate(int itotal,int totsco)
+{
+    int i,j,sum;
+    for(i=0;i<itotal;i++)
+    {
+        sum=0;
+        for(j=0;j<totsco;j++)
+        {
+            sum+=mdata[i].mscores[j];
+        }
+        mdata[i].mscores[totsco]=sum;
+        mdata[i].mscores[totsco+1]=sum/totsco;
+    }
+}
+
+//按照成绩排序的函数
+void sort(int itotal,int totsco)
+{
+    int i,j,k,counter=1;
+    for(i=0;;i=0)
+    {
+        while(mdata[i].ranking!=0&&i<itotal)
+        {
+            i++;
+        }
+        k=i;
+        for(j=i+1;j<itotal;j++)
+        {
+            while(mdata[j].ranking!=0)
+            {
+                j++;
+            }
+            if(mdata[j].mscores[totsco]>mdata[k].mscores[totsco]&&j<itotal)
+            {
+                k=j;
+            }
+        }
+        mdata[k].ranking=counter;
+        counter++;
+        if(i>=itotal)
+        {
+            break;
+        }
+    }
+}
+
+//按照姓名的字典顺序排序的函数：
+void namesort(int itotal,int totsco)
+{
+    char ctemp[20];
+    int i,j,k,m;
+    for(i=0;i<itotal;i++)
+    {
+        mdata[i].flag=0;
+    }
+    for(i=0;i<itotal;)
+    {
+        while(mdata[i].flag==1&&i<itotal-1)
+        {
+            i++;
+        }
+        if(i==itotal-1&&mdata[itotal-1].flag==1)
+        {
+            break;
+        }
+        k=i;
+        for(j=i;j<itotal;j++)
+        {
+            while(mdata[j].flag==1&&j<itotal-1)
+            {
+                j++;
+            }
+            if(j==itotal-1&&mdata[j].flag==1)
+            {
+                break;
+            }
+            if(strcmp(mdata[j].mname,mdata[k].mname)<0)
+            {
+                k=j;
+            }
+            if(j==itotal)
+            {
+                break;
+            }
+        }
+        mdata[k].flag=1;
+        printf("number: %10.0d name: %15s",mdata[k].number,mdata[k].mname);
+        printf("  ");
+        for(m=0;m<totsco;m++)
+        {
+            printf("%3.1lf ",mdata[k].mscores[m]);
+        }
+        printf("totalscore: %3.1lf averagescore: %3.3lf\n",mdata[k].mscores[totsco],mdata[k].mscores[totsco+1]);
+    }
+}
+
+//按照学号查找的函数：
+void numsearch(int itotal,int totsco)
+{
+    int i=0,j,num;
+    printf("please input the number of the student you want to search:");
+    scanf("%d",&num);
+    while(mdata[i].number!=num&&i<itotal)
+    {
+        i++;
+    }
+    if(i==itotal)
+    {
+        printf("There's no information you want\n");
+    }
+    else
+    {
+        printf("ranking: %.0d  number: %.0d  name: %s  ",mdata[i].ranking,mdata[i].number,mdata[i].mname);
+        for(j=0;j<totsco;j++)
+        {
+            printf("  %.1lf ",mdata[i].mscores[j]);
+        }
+        printf("totscore: %3.1lf averagescore: %2.3lf\n",mdata[i].mscores[totsco],mdata[i].mscores[totsco+1]);
+    }
+}
+
+//按照姓名查找的函数:
+void namsearch(int itotal,int totsco)
+{
+    int i,j;
+    char nam[20];
+    printf("please input the name you want to search:");
+    scanf("%s",nam);
+    for(i=0;i<itotal;i++)
+    {
+        if(i==itotal-1&&strcmp(mdata[i].mname,nam)!=0)
+        {
+            printf("There's no information you want!\n");
+            break;
+        }
+        if(strcmp(mdata[i].mname,nam)!=0)
+        {
+            continue;
+        }
+        printf("ranking: %2.0d  number: %.0d  name: %15s  ",mdata[i].ranking,mdata[i].number,mdata[i].mname);
+        for(j=0;j<totsco;j++)
+        {
+            printf("%.1lf  ",mdata[i].mscores[j]);
+        }
+        printf("totscore: %3.1lf averagescore: %2.3lf\n",mdata[i].mscores[totsco],mdata[i].mscores[totsco+1]);
+        break;
+    }
+}
+
+//分析成绩的函数：
+void analysis(int itotal,int totsco)
+{
+    int i,j,k=0;
+    for(i=0;i<totsco;i++)
+    {
+        k=0;
+        printf("course: %d ",i+1);
+        for(j=0;j<itotal;j++)
+        {
+            if(mdata[j].mscores[i]>=90)
+                k++;
+        }
+        printf("90-100rate: %.3lf  ",(double)k/itotal);
+        k=0;
+        for(j=0;j<itotal;j++)
+        {
+            if(mdata[j].mscores[i]>=80&&mdata[j].mscores[i]<90)
+                k++;
+        }
+        printf("80-90rate: %.3lf  ",(double)k/itotal);
+        k=0;
+        for(j=0;j<itotal;j++)
+        {
+            if(mdata[j].mscores[i]>=70&&mdata[j].mscores[i]<80)
+                k++;
+        }
+        printf("70-80rate: %.3lf  ",(double)k/itotal);
+        k=0;
+        for(j=0;j<itotal;j++)
+        {
+            if(mdata[j].mscores[i]>=60&&mdata[j].mscores[i]<70)
+                k++;
+        }
+        printf("60-70rate: %.3lf  ",(double)k/itotal);
+        k=0;
+        for(j=0;j<itotal;j++)
+        {
+            if(mdata[j].mscores[i]<60)
+                k++;
+        }
+        printf("<60rate: %.3lf\n",(double)k/itotal);
+    }
+}
+
+//用于输出的函数
+void output(int itotal,int totsco,int (*poutput)(void))
+{
+    int i,j,k,l,m;
+    for(i=0;i<itotal;i++)
+    {
+        mdata[i].flag=0;
+    }
+    point1:
+    for(i=0;i<itotal;)
+    {
+        for(m=0;m<itotal;m++)
+        {
+            if(mdata[m].flag==0)
+            {
+                break;
+            }
+            if(m==itotal-1&&mdata[m].flag==1)
+            {
+                return;
+            }
+        }
+        while(mdata[i].flag==1)
+        {
+            i++;
+        }
+        k=i;
+        for(j=i+1;j<itotal;j++)
+        {
+            while(mdata[j].flag==1&&j<itotal-1)
+            {
+                j++;
+            }
+            if(poutput()==4)
+            {
+                while(j==itotal-1&&mdata[j].flag==1)
+                {
+                    mdata[k].flag=1;
+                    printf("ranking: %2.0d  number: %.0d  ",mdata[k].ranking,mdata[k].number);
+                    printf("name: %15s  ",mdata[k].mname);
+                    for(l=0;l<totsco;l++)
+                    {
+                        printf("%.1lf  ",mdata[k].mscores[l]);
+                    }
+                    printf("totalscore: %3.1lf  averagescore: %2.3lf\n",mdata[k].mscores[totsco],mdata[k].mscores[totsco+1]);
+                    goto point1;
+                }
+                if(mdata[j].ranking<mdata[k].ranking)
+                {
+                    k=j;
+                }
+            }
+            else if(poutput()==5)
+            {
+                while(j==itotal-1&&mdata[j].flag==1)
+                {
+                    mdata[k].flag=1;
+                    printf("ranking: %2.0d  number: %.0d  ",mdata[k].ranking,mdata[k].number);
+                    printf("name: %15s  ",mdata[k].mname);
+                    for(l=0;l<totsco;l++)
+                    {
+                        printf("%.1lf  ",mdata[k].mscores[l]);
+                    }
+                    printf("totalscore: %3.1lf  averagescore: %2.3lf\n",mdata[k].mscores[totsco],mdata[k].mscores[totsco+1]);
+                    goto point1;
+                }
+                if(mdata[j].ranking>mdata[k].ranking)
+                {
+                    k=j;
+                }
+            }
+            else if(poutput()==6)
+            {
+                while(j==itotal-1&&mdata[j].flag==1)
+                {
+                    mdata[k].flag=1;
+                    printf("ranking: %2.0d  number: %.0d  ",mdata[k].ranking,mdata[k].number);
+                    printf("name: %15s  ",mdata[k].mname);
+                    for(l=0;l<totsco;l++)
+                    {
+                        printf("%.1lf  ",mdata[k].mscores[l]);
+                    }
+                    printf("totalscore: %3.1lf  averagescore: %2.3lf\n",mdata[k].mscores[totsco],mdata[k].mscores[totsco+1]);
+                    goto point1;
+                }
+                if(mdata[j].number<mdata[k].number)
+                {
+                    k=j;
+                }
+            }
+        }
+        mdata[k].flag=1;
+        printf("ranking: %2.0d  number: %.0d  ",mdata[k].ranking,mdata[k].number);
+        printf("name: %15s  ",mdata[k].mname);
+        for(l=0;l<totsco;l++)
+        {
+            printf("%.1lf  ",mdata[k].mscores[l]);
+        }
+        printf("totalscore: %3.1lf  averagescore: %2.3lf\n",mdata[k].mscores[totsco],mdata[k].mscores[totsco+1]);                   
+    }
+}
+int choose4(void)
+{
+    return 4;
+}
+int choose5(void)
+{
+    return 5;
+}
+int choose6(void)
+{
+    return 6;
+}
